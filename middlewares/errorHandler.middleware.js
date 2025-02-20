@@ -1,4 +1,4 @@
-export const globalErrorHandler = (error, req, res, next) => {
+export const globalErrorHandler = (error, req, res) => {
   let statusCode = error.statusCode || 500;
   let message = error.message || "Internal Server Error";
   let errorsArray = error.errors || [];
