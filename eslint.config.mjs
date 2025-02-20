@@ -20,7 +20,6 @@ export default [
     rules: {
       "no-extra-parens": "error",
       "no-extra-semi": "error",
-      "no-unused-vars": "warn",
       "no-irregular-whitespace": "error",
       "no-console": "off",
       "eqeqeq": "error",
