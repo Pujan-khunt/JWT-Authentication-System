@@ -28,6 +28,7 @@ export default [
       "semi": ["error", "always"],
       "dot-notation": "error",
       "no-alert": "warn",
+      "quotes": ["error", "double"]
     }
   }
 ];
