@@ -1,4 +1,5 @@
 import "dotenv/config";
+import jwt from "jsonwebtoken";
 
 export const generateTokens = (user) => {
   // Create an access token to send to the user.
@@ -21,4 +22,4 @@ export const generateTokens = (user) => {
   );
 
   return { accessToken, refreshToken };
-}
+};

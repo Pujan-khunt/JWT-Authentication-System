@@ -3,4 +3,4 @@ node_modules/
 .vscode
 .cph
 test.html
-logs/
+logs/*

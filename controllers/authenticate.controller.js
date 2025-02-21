@@ -1,9 +1,10 @@
+import { asyncHandler } from "../middlewares/asyncHandler.middleware.js";
 import { User } from "../models/User.model.js";
 import { ApiError } from "../utils/ApiError.util.js";
 import { ApiResponse } from "../utils/ApiResponse.util.js";
 import { generateTokens } from "../utils/generateJWT.js";
 
-export const authenticateUser = async (req, res) => {
+export const authenticateUser = asyncHandler(async (req, res) => {
   // Getting credentials from req.body parsed by express.json() middleware.
   const { username, password } = req.body;
 
@@ -13,7 +14,7 @@ export const authenticateUser = async (req, res) => {
   }
 
   // Check if a user with provided username exists.
-  const foundUser = await User.findOne({ username }).exec();
+  const foundUser = await User.findOne({ username }).select("+password").exec();
   if (!foundUser) {
     throw new ApiError(404, `User with username = ${username} doesn't exist.`);
   }
@@ -25,9 +26,17 @@ export const authenticateUser = async (req, res) => {
   }
 
   // Save refresh token in the DB.
-  const { accessToken, refreshToken } = generateTokens();
+  const { accessToken, refreshToken } = generateTokens(foundUser);
   foundUser.refreshToken = refreshToken;
   await foundUser.save();
 
-  res.status(200).json(new ApiResponse(200, { accessToken, refreshToken }, `User with username = ${foundUser.username} successfully logged in.`));
-}
+  // Send refresh token as HTTP-only cookie
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 7 * 24 * 60 * 60 * 100,
+    sameSite: "Strict"
+  });
+
+  res.status(200).json(new ApiResponse(200, { accessToken }, `User with username ${foundUser.username} successfully logged in.`));
+});

@@ -15,16 +15,16 @@ const UserSchema = new Schema({
     select: false
   },
   refreshToken: {
-    type: String,
-    default: ""
+    type: [String],
+    default: []
   }
 }, { timestamps: true });
 
 // Hash passwords whenever they are modified or set for the first time.
 UserSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+  if (!this.isModified("password")) {return next();}
   try {
-    this.password = await bcrypt.hash(this.password, salt);
+    this.password = await bcrypt.hash(this.password, 10);
     next();
   } catch (error) {
     next(error);
@@ -32,7 +32,7 @@ UserSchema.pre("save", async function (next) {
 });
 
 UserSchema.methods.comparePassword = async function (providedPassword) {
-  return await bcrypt.compare(providedPassword, this.password);
-}
+  return bcrypt.compare(providedPassword, this.password);
+};
 
 export const User = mongoose.model("User", UserSchema);

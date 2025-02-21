@@ -1,6 +1,7 @@
 import express from "express";
 import "dotenv/config";
-import {connectDB} from "./config/connectDB.js";
+import { connectDB } from "./config/connectDB.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,14 +22,17 @@ app.use(cors(corsOptions));
 // Common middlewares which convert data into JS objects.
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Import Routes
 import registrationRoutes from "./routes/register.routes.js";
 import authorizationRoutes from "./routes/authenticate.routes.js";
+import refreshTokenRoutes from "./routes/refreshToken.routes.js";
 
 // Routes
 app.use("/register", registrationRoutes);
 app.use("/login", authorizationRoutes);
+app.use("/refresh", refreshTokenRoutes);
 
 // Custom global error handling middleware.
 import { globalErrorHandler } from "./middlewares/errorHandler.middleware.js";

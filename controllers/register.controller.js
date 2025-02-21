@@ -29,6 +29,14 @@ export const registerUser = asyncHandler(async (req, res) => {
   newUser.refreshToken = refreshToken;
   await newUser.save();
 
+  // Send refresh tokens as HTTP-only cookie
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true, // Prevents JS Access
+    secure: process.env.NODE_ENV === "production", // Send only over HTTPS in production environment
+    sameSite: "Strict", // Prevents CSRF attacks
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 day
+  });
+
   // Sending the ID and the Username of the new user
-  res.status(201).json(new ApiResponse(201, { id: newUser._id, username: newUser.username, accessToken, refreshToken }, `User with username = ${username} created successfully.`));
+  res.status(201).json(new ApiResponse(201, { id: newUser._id, username: newUser.username, accessToken }, `User with username = ${username} created successfully.`));
 });
