@@ -36,6 +36,10 @@ app.use("/login", authorizationRoutes);
 app.use("/refresh", refreshTokenRoutes);
 app.use("/logout", logoutRoutes);
 
+// Verification of JWT - middleware
+import { verifyJWT } from "./middlewares/verifyJWT.middleware.js";
+app.use(verifyJWT);
+
 // Custom global error handling middleware.
 import { globalErrorHandler } from "./middlewares/errorHandler.middleware.js";
 app.use(globalErrorHandler);

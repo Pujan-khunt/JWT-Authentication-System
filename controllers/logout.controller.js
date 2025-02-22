@@ -1,6 +1,5 @@
 import { asyncHandler } from "../middlewares/asyncHandler.middleware.js";
 import { User } from "../models/User.model.js";
-import { ApiError } from "../utils/ApiError.util.js";
 import { ApiResponse } from "../utils/ApiResponse.util.js";
 
 export const logoutUser = asyncHandler(async (req, res) => {

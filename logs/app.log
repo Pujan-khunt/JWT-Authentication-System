@@ -202,3 +202,7 @@
 22-02-2025 | 17:03:39 | POST /login 200 same-origin 141.392 ms
 22-02-2025 | 17:03:42 | POST /logout 200 same-origin 109.816 ms
 22-02-2025 | 17:05:48 | POST /logout 200 same-origin 3.759 ms
+22-02-2025 | 17:12:43 | POST /register 201 same-origin 206.027 ms
+22-02-2025 | 17:12:50 | POST /login 200 same-origin 131.646 ms
+22-02-2025 | 17:12:56 | GET /refresh 200 same-origin 73.594 ms
+22-02-2025 | 17:13:12 | GET /refresh 403 same-origin 37.296 ms

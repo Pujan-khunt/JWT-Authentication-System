@@ -3,7 +3,7 @@ import { ApiError } from "../utils/ApiError.util.js";
 import jwt from "jsonwebtoken";
 import { ApiResponse } from "../utils/ApiResponse.util.js";
 import { User } from "../models/User.model.js";
-import { generateTokens } from "../utils/generateJWT.js";
+import { generateTokens } from "../utils/generateJWT.util.js";
 
 export const handleRefreshToken = asyncHandler(async (req, res) => {
   // Check existence of refresh token in the form of cookies.

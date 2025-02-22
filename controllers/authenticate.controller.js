@@ -3,7 +3,7 @@ import { asyncHandler } from "../middlewares/asyncHandler.middleware.js";
 import { User } from "../models/User.model.js";
 import { ApiError } from "../utils/ApiError.util.js";
 import { ApiResponse } from "../utils/ApiResponse.util.js";
-import { generateTokens } from "../utils/generateJWT.js";
+import { generateTokens } from "../utils/generateJWT.util.js";
 
 export const authenticateUser = asyncHandler(async (req, res) => {
   // Getting credentials from req.body parsed by express.json() middleware.
