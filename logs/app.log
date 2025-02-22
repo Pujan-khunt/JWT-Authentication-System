@@ -167,3 +167,11 @@
 20-02-2025 | 18:06:56 | POST / 200 http://127.0.0.1:5500 0.525 ms
 20-02-2025 | 18:06:56 | POST / 200 http://127.0.0.1:5500 0.940 ms
 20-02-2025 | 18:06:57 | POST / 200 http://127.0.0.1:5500 0.780 ms
+21-02-2025 | 20:25:48 | POST /register 201 same-origin 190.129 ms
+21-02-2025 | 20:25:53 | POST /register 201 same-origin 150.814 ms
+21-02-2025 | 20:25:57 | POST /register 201 same-origin 148.965 ms
+21-02-2025 | 20:27:38 | POST /login 200 same-origin 165.582 ms
+21-02-2025 | 20:29:08 | GET /refresh 200 same-origin 97.243 ms
+21-02-2025 | 20:29:29 | GET /refresh 200 same-origin 81.216 ms
+22-02-2025 | 10:59:01 | POST /login 200 same-origin 169.029 ms
+22-02-2025 | 10:59:10 | POST /logout 500 same-origin 8.154 ms

@@ -12,36 +12,35 @@ export const handleRefreshToken = asyncHandler(async (req, res) => {
     throw new ApiError(401, "No refresh token provided.");
   }
 
-  // Find user with existing refresh token 
-  const user = await User.findOne({ refreshToken: { $in: [refreshToken] } }).exec();
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 
-  // No user found. Suspect token reuse.
-  if (!user) {
-    try {
-      // No error in verfication of jwt confirms an attack on the user.
-      const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    // Find the user by token and clear their session
+    const user = await User.findOne({
+      username: decoded.username,
+      refreshToken: { $in: [refreshToken] }
+    }).exec()
 
-      // Delete all refresh tokens for the compromised user
-      await User.updateOne({ username: decoded.username }, { $set: { refreshToken: [] } });
-    } catch (error) {
-      throw new ApiError(403, "Invalid or expired refresh token.", [error]);
+    // Token reuse detected
+    if (!user) {
+      // Token is valid (verified by jwt) but not in DB, it means it was used 
+      // before. This indicates potential token theft.
+      await User.updateOne(
+        // Invalidate all refresh tokens of the user who created this provided refresh token.
+        { username: decoded.username },
+        { $set: { refreshToken: [] } }
+      )
+
+      throw new ApiError(403, "Token reuse detected. Invalidated all sessions.");
     }
 
-    throw new ApiError(403, "Token reuse detected. All sessions cleared.");
-  }
-
-  try {
-    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-
-    // Removed the used refresh token from the array (Token Rotation)
+    // Remove the existing refresh token from DB.
     user.refreshToken = user.refreshToken.filter(token => token !== refreshToken);
 
-    // Generate a fresh new set of tokens
-    const result = generateTokens(user);
-    const newAccessToken = result.accessToken;
-    const newRefreshToken = result.refreshToken;
-    
-    // Store the new refresh token in the array
+    // Generate fresh token pair
+    const { accessToken: newAccessToken, refreshToken: newRefreshToken } = generateTokens(user);
+
+    // Save the new refresh token in the DB.
     user.refreshToken.push(newRefreshToken);
     await user.save();
 
@@ -60,12 +59,26 @@ export const handleRefreshToken = asyncHandler(async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
-    // Send the freshly generated access token.
-    return res.status(200).json(new ApiResponse(200, { accessToken: newAccessToken }, "Access Token Refreshed Successfully."));
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        { accessToken: newAccessToken },
+        "Access token refreshed successfully."
+      )
+    )
+
   } catch (error) {
-    // If token verification fails then force logout the user
-    user.refreshToken = [];
-    await user.save();
-    throw new ApiError(403, "Invalid or expired refresh token.");
+    // If verification fails, invalidate all refresh tokens
+    if (error instanceof jwt.JsonWebTokenError) {
+      // Find the user by token and clear their session
+      const user = await User.findOne({ refreshToken: { $in: [refreshToken] } });
+
+      if (user) {
+        user.refreshToken = [];
+        await user.save();
+      }
+    }
+
+    throw new ApiError(403, "Invalid or expired refresh token");
   }
 });

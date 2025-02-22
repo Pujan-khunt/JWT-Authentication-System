@@ -6,7 +6,7 @@ import cookieParser from "cookie-parser";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Connect the database and stop the program on failure.
+// Connect the database (stops the program on failure).
 connectDB();
 
 // Custom morgan middlwares for logging in console and log files.
@@ -28,11 +28,13 @@ app.use(cookieParser());
 import registrationRoutes from "./routes/register.routes.js";
 import authorizationRoutes from "./routes/authenticate.routes.js";
 import refreshTokenRoutes from "./routes/refreshToken.routes.js";
+import logoutRoutes from "./routes/logout.routes.js";
 
 // Routes
 app.use("/register", registrationRoutes);
 app.use("/login", authorizationRoutes);
 app.use("/refresh", refreshTokenRoutes);
+app.use("/logout", logoutRoutes);
 
 // Custom global error handling middleware.
 import { globalErrorHandler } from "./middlewares/errorHandler.middleware.js";

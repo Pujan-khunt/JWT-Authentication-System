@@ -14,21 +14,21 @@ export const authenticateUser = asyncHandler(async (req, res) => {
   }
 
   // Check if a user with provided username exists.
-  const foundUser = await User.findOne({ username }).select("+password").exec();
-  if (!foundUser) {
+  const existingUser = await User.findOne({ username }).select("+password").exec();
+  if (!existingUser) {
     throw new ApiError(404, `User with username = ${username} doesn't exist.`);
   }
 
   // Verify the password provided with the hashed password from DB.
-  const passwordMatches = await foundUser.comparePassword(password);
+  const passwordMatches = await existingUser.comparePassword(password);
   if (!passwordMatches) {
     throw new ApiError(401, "Password is invalid.");
   }
 
   // Save refresh token in the DB.
-  const { accessToken, refreshToken } = generateTokens(foundUser);
-  foundUser.refreshToken = refreshToken;
-  await foundUser.save();
+  const { accessToken, refreshToken } = generateTokens(existingUser);
+  existingUser.refreshToken.push(refreshToken);
+  await existingUser.save();
 
   // Send refresh token as HTTP-only cookie
   res.cookie("refreshToken", refreshToken, {
@@ -38,5 +38,11 @@ export const authenticateUser = asyncHandler(async (req, res) => {
     sameSite: "Strict"
   });
 
-  res.status(200).json(new ApiResponse(200, { accessToken }, `User with username ${foundUser.username} successfully logged in.`));
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      { accessToken },
+      `User with username ${existingUser.username} successfully logged in.`
+    )
+  );
 });
