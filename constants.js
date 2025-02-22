@@ -1,3 +1,7 @@
 const dirname = import.meta.dirname;
+const MAX_SESSIONS = 3;
 
-export { dirname };
+export {
+  dirname,
+  MAX_SESSIONS
+};

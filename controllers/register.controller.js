@@ -25,7 +25,7 @@ export const registerUser = asyncHandler(async (req, res) => {
   // Generate JWT tokens
   const { accessToken, refreshToken } = generateTokens(newUser);
 
-  // Save refresh token in database
+  // Save refresh token in database (as its not been used to generate new access token)
   newUser.refreshToken.push(refreshToken);
   await newUser.save();
 
