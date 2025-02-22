@@ -28,13 +28,13 @@ export const authenticateUser = asyncHandler(async (req, res) => {
 
   // Save refresh token in the DB.
   const { accessToken, refreshToken } = generateTokens(existingUser);
-
+  
   // Only a set number of sessions are allowed per user
-  if(existingUser.refreshToken.length > MAX_SESSIONS) {
-    // Remove the first token from the array
-    existingUser.refreshToken = existingUser.refreshToken.slice(1, existingUser.refreshToken.length - 1);
+  if(existingUser.refreshToken.length >= MAX_SESSIONS) {
+    // Remove/Invalidate the oldest session
+    existingUser.refreshToken.shift();
   }
-
+  
   // Add the new refresh token into db. (as its not been used to generate a new access token yet)
   existingUser.refreshToken.push(refreshToken);
   await existingUser.save();

@@ -8,11 +8,12 @@ export const logoutUser = asyncHandler(async (req, res) => {
   // Deleting them anyways.
   const refreshToken = req.cookies.refreshToken;
   if (!refreshToken) {
-    throw new ApiError(200, "User successfully logged out.");
+    res.clearCookie("refreshToken", { httpOnly: true, sameSite: "Strict", secure: process.env.NODE_ENV === "production" });
+    return res.status(200).json(new ApiResponse(200, null, "User successfully logged out."));
   }
 
   // Checking existence of refresh token in db.
-  const existingUser = User.findOne({ refreshToken: { $in: [refreshToken] } });
+  const existingUser = await User.findOne({ refreshToken: { $in: [refreshToken] } }).exec();
   if (!existingUser) {
     res.clearCookie("refreshToken", { httpOnly: true, sameSite: "Strict", secure: process.env.NODE_ENV === "production" });
     return res.status(200).json(new ApiResponse(200, null, "User successfully logged out."));
