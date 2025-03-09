@@ -44,4 +44,4 @@ app.use(verifyJWT);
 import { globalErrorHandler } from "./middlewares/errorHandler.middleware.js";
 app.use(globalErrorHandler);
 
-app.listen(PORT, () => console.log("Server Unfortunately Running At http://localhost:3000/"));
+app.listen(PORT, () => console.log(`Server Unfortunately Running At http://localhost:${process.env.PORT}/`));

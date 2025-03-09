@@ -12,7 +12,7 @@ const UserSchema = new Schema({
   password: {
     type: String,
     required: true,
-    select: false
+    select: false // wont automatically select the password if not mentioned explicitly
   },
   refreshToken: {
     type: [String],

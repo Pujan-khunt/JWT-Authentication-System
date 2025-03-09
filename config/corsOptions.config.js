@@ -1,6 +1,7 @@
 import { ApiError } from "../utils/ApiError.util.js";
 import { allowedOrigins } from "./allowedOrigins.js";
 
+// Remove the "/" from the end, if any.
 const normalizeOrigin = (origin) => {
   if(origin?.endsWith("/")) {
     return origin.slice(0, -1);
@@ -8,13 +9,13 @@ const normalizeOrigin = (origin) => {
   return origin;
 };
 
-const customOriginAllowing = (origin, callback) => {
+const customOriginAllowing = (origin, cb) => {
   const normalizedOrigin = normalizeOrigin(origin);
 
   if (allowedOrigins.includes(normalizedOrigin) || !normalizedOrigin) {
-    callback(null, true);
+    cb(null, true);
   } else {
-    callback(new ApiError(`Origin ${normalizedOrigin} not allowed by CORS`), false);
+    cb(new ApiError(`Origin ${normalizedOrigin} is not allowed by CORS`), false);
   }
 };
 

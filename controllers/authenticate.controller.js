@@ -11,13 +11,13 @@ export const authenticateUser = asyncHandler(async (req, res) => {
 
   // Username and Password both are required fields.
   if (!username || !password) {
-    throw new ApiError(400, "Username and Password are required fields.");
+    throw new ApiError(400, "Username and Password are required to Authenticate a User.");
   }
 
   // Check if a user with provided username exists.
   const existingUser = await User.findOne({ username }).select("+password").exec();
   if (!existingUser) {
-    throw new ApiError(404, `User with username = ${username} doesn't exist.`);
+    throw new ApiError(404, `User with username "${username}" doesn't exist.`);
   }
 
   // Verify the password provided with the hashed password from DB.
@@ -44,7 +44,6 @@ export const authenticateUser = asyncHandler(async (req, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     maxAge: 7 * 24 * 60 * 60 * 100,
-    sameSite: "Strict"
   });
 
   res.status(200).json(

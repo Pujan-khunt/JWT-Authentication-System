@@ -10,7 +10,7 @@ export const registerUser = asyncHandler(async (req, res) => {
 
   // Username and Password both are required fields
   if (!username || !password) {
-    throw new ApiError(400, "Username and Password are required fields.");
+    throw new ApiError(400, "Username and Password are required to Register a new User.");
   }
 
   // Users with duplicate usernames are not allowed
@@ -33,7 +33,6 @@ export const registerUser = asyncHandler(async (req, res) => {
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true, // Prevents JS Access
     secure: process.env.NODE_ENV === "production", // Send only over HTTPS in production environment
-    sameSite: "Strict", // Prevents CSRF attacks
     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 day
   });
 
@@ -42,7 +41,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     new ApiResponse(
       201,
       { id: newUser._id, username: newUser.username, accessToken },
-      `User with username = ${username} created successfully.`
+      `User with username "${username}" created successfully.`
     )
   );
 });
