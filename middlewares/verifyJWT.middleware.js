@@ -10,16 +10,12 @@ export const verifyJWT = (req, res, next) => {
     throw new ApiError(401, "Authorization header is missing.");
   }
 
-  console.log("Auth Header", authHeader);
-
   // Extracting the token from the authorization header
   const token = authHeader.split(" ")[1];
   const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
   
-  console.log("Decoded information from jwt:", decoded);
-
   // Attaching the username and id from the decoded token to the request object (so controllers can get a direct access)
   req.username = decoded.username;
   req.userId = decoded.id;
   next();
-}
+};

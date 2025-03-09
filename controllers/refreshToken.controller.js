@@ -12,35 +12,39 @@ export const handleRefreshToken = asyncHandler(async (req, res) => {
     throw new ApiError(401, "No refresh token provided.");
   }
 
+  // Verify the creation of the refresh token using our secret.
   const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 
-  // Find the user by token and clear their session
-  const user = await User.findOne({
-    username: decoded.username,
-    refreshToken: { $in: [refreshToken] }
-  }).exec();
+  // Find the user based on the username from the decoded refresh token.
+  const user = await User.findOne({ username: decoded.username }).exec();
 
-  // Token reuse detected
-  if (!user) {
-    // Token is valid (verified by jwt) but not in DB, it means it was used 
-    // before. This indicates potential token theft.
-    await User.updateOne(
-      // Invalidate all refresh tokens of the user who created this provided refresh token.
-      { username: decoded.username },
-      { $set: { refreshToken: [] } }
-    );
+  const refreshTokenMatches = await user.compareRefreshToken(refreshToken);
+
+  // Token is valid (verified by jwt) but when compared against existing tokens
+  // In the DB, it doesn't match.
+  if (!user || !refreshTokenMatches) {
+    // Clear the session of the compromised user who created this refreshToken.(selecting user based on the username of the jwt)
+    if (user) {
+      user.refreshTokens = [];
+      await user.save();
+    }
 
     throw new ApiError(403, "Token reuse detected. Invalidated all sessions.");
   }
 
-  // Remove the existing refresh token from DB.
-  user.refreshToken = user.refreshToken.filter(token => token !== refreshToken);
+  // Upto this point, the refreshToken is valid and a user exists with the provided refreshToken.
+  // Remove the existing refresh token from DB (As it will now become used).
+  const index = user.getRefreshTokenIndex(refreshToken);
+  if (index !== -1) {
+    user.refreshTokens.splice(index, 1);
+    // Saving to DB later, after appending the new tokens.
+  }
 
   // Generate fresh token pair
   const { accessToken: newAccessToken, refreshToken: newRefreshToken } = generateTokens(user);
 
-  // Save the new refresh token in the DB.
-  user.refreshToken.push(newRefreshToken);
+  // Save the new refresh token in the DB. (automatically hashed on saving)
+  user.refreshTokens.push(newRefreshToken);
   await user.save();
 
   // Delete the cookie to send a new one.

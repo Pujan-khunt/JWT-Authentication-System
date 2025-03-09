@@ -19,7 +19,7 @@ export const globalErrorHandler = async (error, req, res, next) => {
         const user = await User.findOne({ refreshToken: { $in: [refreshToken] } });
 
         if (user) {
-          user.refreshToken = [];
+          user.refreshTokens = [];
           await user.save();
         }
       } catch (dbError) {

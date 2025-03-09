@@ -30,13 +30,13 @@ export const authenticateUser = asyncHandler(async (req, res) => {
   const { accessToken, refreshToken } = generateTokens(existingUser);
   
   // Only a set number of sessions are allowed per user
-  if(existingUser.refreshToken.length >= MAX_SESSIONS) {
+  if(existingUser.refreshTokens.length >= MAX_SESSIONS) {
     // Remove/Invalidate the oldest session
-    existingUser.refreshToken.shift();
+    existingUser.refreshTokens.shift();
   }
   
   // Add the new refresh token into db. (as its not been used to generate a new access token yet)
-  existingUser.refreshToken.push(refreshToken);
+  existingUser.refreshTokens.push(refreshToken);
   await existingUser.save();
 
   // Send refresh token as HTTP-only cookie
@@ -50,7 +50,7 @@ export const authenticateUser = asyncHandler(async (req, res) => {
     new ApiResponse(
       200,
       { accessToken },
-      `User with username ${existingUser.username} successfully logged in.`
+      `User with username '${existingUser.username}' successfully logged in.`
     )
   );
 });

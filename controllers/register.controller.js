@@ -26,7 +26,7 @@ export const registerUser = asyncHandler(async (req, res) => {
   const { accessToken, refreshToken } = generateTokens(newUser);
 
   // Save refresh token in database (as its not been used to generate new access token)
-  newUser.refreshToken.push(refreshToken);
+  newUser.refreshTokens.push(refreshToken);
   await newUser.save();
 
   // Send refresh tokens as HTTP-only cookie
@@ -41,7 +41,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     new ApiResponse(
       201,
       { id: newUser._id, username: newUser.username, accessToken },
-      `User with username "${username}" created successfully.`
+      `User with username '${username}' created successfully.`
     )
   );
 });
