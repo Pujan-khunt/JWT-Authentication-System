@@ -2,6 +2,7 @@ import express from "express";
 import "dotenv/config";
 import { connectDB } from "./config/connectDB.js";
 import cookieParser from "cookie-parser";
+import { loginLimiter } from "./middlewares/loginLimiter.middleware.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,6 +22,9 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// Rate limiter middleware
+app.use("/login", loginLimiter);
 
 // Import Routes
 import registrationRoutes from "./routes/register.routes.js";
