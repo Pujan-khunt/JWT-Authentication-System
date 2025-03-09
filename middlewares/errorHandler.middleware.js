@@ -8,30 +8,15 @@ export const globalErrorHandler = async (error, req, res, next) => {
   let message = "Internal Server Error";
   let errorsArray = [];
 
-  if (error instanceof jwt.JsonWebTokenError) {
-    statusCode = 403;
-    message = "Authentication Failed. Reason: Invalid token.";
-
-    const refreshToken = req.cookies.refreshToken;
-
-    if (refreshToken) {
-      try {
-        const user = await User.findOne({ refreshToken: { $in: [refreshToken] } });
-
-        if (user) {
-          user.refreshTokens = [];
-          await user.save();
-        }
-      } catch (dbError) {
-        console.error("Error while clearing user sessions:", error);
-      }
-    }
-  }
-  else if (error instanceof jwt.TokenExpiredError) {
+  if (error instanceof jwt.TokenExpiredError) {
     statusCode = 401;
     message = "Your session has expired. Please login again.";
   }
-  else if(error instanceof ApiError) {
+  else if (error instanceof jwt.JsonWebTokenError) {
+    statusCode = 403;
+    message = "Authentication Failed. Reason: Invalid token.";
+  }
+  else if (error instanceof ApiError) {
     statusCode = error.statusCode;
     message = error.message;
     errorsArray = error.errors;

@@ -5,7 +5,7 @@ import { User } from "../models/User.model.js";
 import { generateTokens } from "../utils/generateJWT.util.js";
 
 export const registerUser = asyncHandler(async (req, res) => {
-  // Getting credentials from req.body parsed by express.json() middleware
+  // Getting credentials from req.body parsed by express.json() (bodyParser) middleware
   const { username, password } = req.body;
 
   // Username and Password both are required fields
@@ -35,6 +35,8 @@ export const registerUser = asyncHandler(async (req, res) => {
     secure: process.env.NODE_ENV === "production", // Send only over HTTPS in production environment
     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 day
   });
+
+  console.log("Refresh Token Array After Registration:",newUser.refreshTokens);
 
   // Sending the ID and the Username of the new user
   res.status(201).json(

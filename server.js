@@ -6,8 +6,6 @@ import cookieParser from "cookie-parser";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Connect the database (stops the program on failure).
-connectDB();
 
 // Custom morgan middlwares for logging in console and log files.
 import { consoleLogger, fileLogger } from "./middlewares/requestLogger.middleware.js";
@@ -44,4 +42,7 @@ app.use(verifyJWT);
 import { globalErrorHandler } from "./middlewares/errorHandler.middleware.js";
 app.use(globalErrorHandler);
 
-app.listen(PORT, () => console.log(`Server Unfortunately Running At http://localhost:${process.env.PORT}/`));
+// Connect the database (stops the program on failure).
+connectDB().then(() => {
+  app.listen(PORT, () => console.log(`Server Unfortunately Running At http://localhost:${process.env.PORT}/`));
+});
