@@ -5,6 +5,8 @@ import { ApiResponse } from "../utils/ApiResponse.util.js";
 import { User } from "../models/User.model.js";
 import { generateTokens } from "../utils/generateJWT.util.js";
 
+const expiresInSeconds = 15 * 60; // 900 seconds (15 minutes)
+
 export const handleRefreshToken = asyncHandler(async (req, res) => {
   // Check existence of refresh token in the form of cookies.
   const refreshToken = req.cookies.refreshToken;
@@ -63,8 +65,9 @@ export const handleRefreshToken = asyncHandler(async (req, res) => {
   return res.status(200).json(
     new ApiResponse(
       200,
-      { 
-        accessToken: newAccessToken 
+      {
+        accessToken: newAccessToken,
+        expiresIn: expiresInSeconds
       },
       "Access token refreshed successfully."
     )

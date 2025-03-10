@@ -4,6 +4,8 @@ import { ApiResponse } from "../utils/ApiResponse.util.js";
 import { User } from "../models/User.model.js";
 import { generateTokens } from "../utils/generateJWT.util.js";
 
+const expiresInSeconds = 15 * 60; // 900 seconds (15 minutes)
+
 export const registerUser = asyncHandler(async (req, res) => {
   // Getting credentials from req.body parsed by express.json() (bodyParser) middleware
   const { username, email, password } = req.body;
@@ -48,7 +50,8 @@ export const registerUser = asyncHandler(async (req, res) => {
         id: newUser._id, 
         username: newUser.username, 
         email: newUser.email,
-        accessToken 
+        accessToken,
+        expiresIn: expiresInSeconds
       },
       `User with username '${username}' created successfully.`
     )

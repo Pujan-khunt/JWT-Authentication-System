@@ -1,12 +1,8 @@
 import express from "express";
 import "dotenv/config";
-import { connectDB } from "./config/connectDB.js";
-import cookieParser from "cookie-parser";
-import { loginLimiter } from "./middlewares/loginLimiter.middleware.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
 
 // Custom morgan middlwares for logging in console and log files.
 import { consoleLogger, fileLogger } from "./middlewares/requestLogger.middleware.js";
@@ -19,12 +15,16 @@ import { corsOptions } from "./config/corsOptions.config.js";
 app.use(cors(corsOptions));
 
 // Common middlewares which convert data into JS objects.
+import cookieParser from "cookie-parser";
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Rate limiter middleware
+import { loginLimiter } from "./middlewares/loginLimiter.middleware.js";
+import { refreshLimiter } from "./middlewares/refreshLimiter.middleware.js";
 app.use("/login", loginLimiter);
+app.use("/refresh", refreshLimiter)
 
 // Import Routes
 import registrationRoutes from "./routes/register.routes.js";
@@ -46,6 +46,7 @@ app.use(verifyJWT);
 import { globalErrorHandler } from "./middlewares/errorHandler.middleware.js";
 app.use(globalErrorHandler);
 
+import { connectDB } from "./config/connectDB.js";
 // Connect the database (stops the program on failure).
 connectDB().then(() => {
   app.listen(PORT, () => console.log(`Server Unfortunately Running At http://localhost:${process.env.PORT}/`));

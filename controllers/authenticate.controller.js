@@ -4,6 +4,8 @@ import { ApiError } from "../utils/ApiError.util.js";
 import { ApiResponse } from "../utils/ApiResponse.util.js";
 import { generateTokens } from "../utils/generateJWT.util.js";
 
+const expiresInSeconds = 15 * 60; // 900 seconds (15 minutes)
+
 // Return a user, if exists based on username or email.
 const getUserByEmailOrUsername = async (username, email) => {
   if(!username) {return await User.findOne({ email }).select("+password").exec();}
@@ -62,7 +64,10 @@ export const authenticateUser = asyncHandler(async (req, res) => {
   res.status(200).json(
     new ApiResponse(
       200,
-      { accessToken },
+      { 
+        accessToken,
+        expiresIn: expiresInSeconds 
+      },
       loginSuccessfulMessage
     )
   );

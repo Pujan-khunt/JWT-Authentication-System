@@ -7,7 +7,7 @@
   const dirname = import.meta.dirname;
 
   // Ensure a directory always exists to store logs
-  const logDirectoryPath = path.join(dirname, "logs");
+  const logDirectoryPath = path.join(dirname, "..", "logs");
   if (!fs.existsSync(logDirectoryPath)) {
     fs.mkdirSync(logDirectoryPath);
   }
