@@ -3,7 +3,8 @@
   import { format } from "date-fns";
   import fs from "fs";
   import path from "path";
-  import { dirname } from "../constants.js";
+  
+  const dirname = import.meta.dirname;
 
   // Ensure a directory always exists to store logs
   const logDirectoryPath = path.join(dirname, "logs");

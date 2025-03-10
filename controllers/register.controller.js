@@ -6,21 +6,25 @@ import { generateTokens } from "../utils/generateJWT.util.js";
 
 export const registerUser = asyncHandler(async (req, res) => {
   // Getting credentials from req.body parsed by express.json() (bodyParser) middleware
-  const { username, password } = req.body;
+  const { username, email, password } = req.body;
 
-  // Username and Password both are required fields
-  if (!username || !password) {
-    throw new ApiError(400, "Username and Password are required to Register a new User.");
+  // Username and Password both are required fields.
+  if (!username || !password || !email) {
+    throw new ApiError(400, "username, email and password are required to register a new User. User not registered.");
   }
 
-  // Users with duplicate usernames are not allowed
-  const existingUser = await User.findOne({ username }).exec();
-  if (existingUser) {
-    throw new ApiError(409, `User with username ${username} already exists.`);
+  // Users with duplicate usernames are not allowed.
+  if (await User.findOne({ username }).exec()) {
+    throw new ApiError(409, `User with username ${username} already exists. User not registered.`);
+  }
+
+  // Users with duplicate emails are not allowed.
+  if (await User.findOne({ email }.exec())) {
+    throw new ApiError(409, `User with email ${email} already exists. User not registered.`);
   }
 
   // Creating user (password automatically hashed in pre-save hook)
-  const newUser = await User.create({ username, password });
+  const newUser = await User.create({ username, email, password });
 
   // Generate JWT tokens
   const { accessToken, refreshToken } = generateTokens(newUser);
@@ -36,13 +40,16 @@ export const registerUser = asyncHandler(async (req, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 day
   });
 
-  console.log("Refresh Token Array After Registration:",newUser.refreshTokens);
-
   // Sending the ID and the Username of the new user
   res.status(201).json(
     new ApiResponse(
       201,
-      { id: newUser._id, username: newUser.username, accessToken },
+      { 
+        id: newUser._id, 
+        username: newUser.username, 
+        email: newUser.email,
+        accessToken 
+      },
       `User with username '${username}' created successfully.`
     )
   );

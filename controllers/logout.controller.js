@@ -3,8 +3,7 @@ import { User } from "../models/User.model.js";
 import { ApiResponse } from "../utils/ApiResponse.util.js";
 
 export const logoutUser = asyncHandler(async (req, res) => {
-  // No problem if no cookies are present,
-  // Deleting them anyways.
+  // No problem if no cookies are present. Deleting them anyways.
   const refreshToken = req.cookies?.refreshToken;
   if (!refreshToken) {
     // Removing a cookie even after checking it doesn't exist is a good security measure.

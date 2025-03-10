@@ -10,6 +10,7 @@ import bcrypt from "bcrypt";
  * @typedef {Object} UserSchema
  * @property {string} username - The username of the user. It is required, unique, trimmed, and stored in lowercase.
  * @property {string} password - The password of the user. It is required and will not be selected automatically unless explicitly mentioned.
+ * @property {string} email - The email of the user. It is required, unique, trimmed, and stored in lowercase.
  * @property {string[]} refreshTokens - An array of refresh tokens associated with the user. Defaults to an empty array.
  * @property {Date} createdAt - The timestamp when the user was created.
  * @property {Date} updatedAt - The timestamp when the user was last updated.
@@ -21,6 +22,13 @@ const UserSchema = new Schema({
     unique: true,
     trim: true,
     lowercase: true
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true
   },
   password: {
     type: String,

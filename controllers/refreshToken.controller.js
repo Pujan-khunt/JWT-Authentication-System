@@ -12,7 +12,7 @@ export const handleRefreshToken = asyncHandler(async (req, res) => {
     throw new ApiError(401, "No refresh token provided.");
   }
 
-  // Verify the creation of the refresh token using our secret.
+  // Verify the creation of the refresh token using private secret key.
   const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 
   // Find the user based on the username from the decoded refresh token.
@@ -63,7 +63,9 @@ export const handleRefreshToken = asyncHandler(async (req, res) => {
   return res.status(200).json(
     new ApiResponse(
       200,
-      { accessToken: newAccessToken },
+      { 
+        accessToken: newAccessToken 
+      },
       "Access token refreshed successfully."
     )
   );

@@ -14,8 +14,9 @@ export const verifyJWT = (req, res, next) => {
   const token = authHeader.split(" ")[1];
   const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
   
-  // Attaching the username and id from the decoded token to the request object (so controllers can get a direct access)
+  // Attaching the username, id and email from the decoded token to the request object for easier access.
   req.username = decoded.username;
   req.userId = decoded.id;
+  req.email = decoded.email;
   next();
 };
