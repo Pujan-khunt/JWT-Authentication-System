@@ -1,9 +1,9 @@
 import { ApiError } from "../utils/ApiError.util.js";
-import { allowedOrigins } from "./allowedOrigins.js";
+const allowedOrigins = process.env.ALLOWED_ORIGINS.split(",") || ["http://localhost:3000"]
 
 // Remove the "/" from the end, if any.
 const normalizeOrigin = (origin) => {
-  if(origin?.endsWith("/")) {
+  if (origin?.endsWith("/")) {
     return origin.slice(0, -1);
   }
   return origin;
