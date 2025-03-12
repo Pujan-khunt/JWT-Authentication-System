@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 
 /**
  * User Schema
@@ -12,6 +13,8 @@ import bcrypt from "bcrypt";
  * @property {string} password - The password of the user. It is required and will not be selected automatically unless explicitly mentioned.
  * @property {string} email - The email of the user. It is required, unique, trimmed, and stored in lowercase.
  * @property {string[]} refreshTokens - An array of refresh tokens associated with the user. Defaults to an empty array.
+ * @property {boolean} isVerified - Boolean value indicating the verification status of the user.
+ * @property {string} verificationToken - Long Encrypted String
  * @property {Date} createdAt - The timestamp when the user was created.
  * @property {Date} updatedAt - The timestamp when the user was last updated.
  */
@@ -40,6 +43,14 @@ const UserSchema = new Schema({
   refreshTokens: {
     type: [String],
     default: []
+  },
+  isVerified: {
+    type: Boolean,
+    required: true,
+    default: false
+  },
+  verificationToken: {
+    type: String,
   }
 }, { timestamps: true });
 

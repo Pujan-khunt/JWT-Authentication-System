@@ -20,23 +20,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Rate limiter middleware
-import { loginLimiter } from "./middlewares/loginLimiter.middleware.js";
-import { refreshLimiter } from "./middlewares/refreshLimiter.middleware.js";
-app.use("/login", loginLimiter);
-app.use("/refresh", refreshLimiter)
-
 // Import Routes
 import registrationRoutes from "./routes/register.routes.js";
 import authorizationRoutes from "./routes/authenticate.routes.js";
 import refreshTokenRoutes from "./routes/refreshToken.routes.js";
 import logoutRoutes from "./routes/logout.routes.js";
+import verificationRoutes from "./routes/verification.routes.js";
 
 // Routes
 app.use("/register", registrationRoutes);
 app.use("/login", authorizationRoutes);
 app.use("/refresh", refreshTokenRoutes);
 app.use("/logout", logoutRoutes);
+app.use("/verify", verificationRoutes);
 
 // Verification of JWT - middleware
 import { verifyJWT } from "./middlewares/verifyJWT.middleware.js";

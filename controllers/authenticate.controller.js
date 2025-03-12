@@ -29,7 +29,7 @@ export const authenticateUser = asyncHandler(async (req, res) => {
   // Find the user either based on their email or username.
   const existingUser = getUserByEmailOrUsername(username, email);
   if (!existingUser) {
-    throw new ApiError(404, `User doesn't exist.`);
+    throw new ApiError(404, "User doesn't exist.");
   }
 
   // Verify the password provided with the hashed password from DB.

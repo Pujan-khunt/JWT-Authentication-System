@@ -3,6 +3,8 @@ import { ApiError } from "../utils/ApiError.util.js";
 import { ApiResponse } from "../utils/ApiResponse.util.js";
 import { User } from "../models/User.model.js";
 import { generateTokens } from "../utils/generateJWT.util.js";
+import { sendVerificationEmail } from "../services/email.service.js";
+import jwt from "jsonwebtoken";
 
 const expiresInSeconds = 15 * 60; // 900 seconds (15 minutes)
 
@@ -21,12 +23,25 @@ export const registerUser = asyncHandler(async (req, res) => {
   }
 
   // Users with duplicate emails are not allowed.
-  if (await User.findOne({ email }.exec())) {
+  if (await User.findOne({ email }).exec()) {
     throw new ApiError(409, `User with email ${email} already exists. User not registered.`);
   }
 
+  // Token for verifying verification email of user.
+  const verificationToken = jwt.sign(
+    { email },
+    process.env.VERIFICATION_TOKEN_SECRET,
+    { expiresIn: "1d" }
+  );
+
   // Creating user (password automatically hashed in pre-save hook)
-  const newUser = await User.create({ username, email, password });
+  const newUser = await User.create({
+    username,
+    email,
+    password,
+    isVerified: false,
+    verificationToken
+  });
 
   // Generate JWT tokens
   const { accessToken, refreshToken } = generateTokens(newUser);
@@ -34,6 +49,10 @@ export const registerUser = asyncHandler(async (req, res) => {
   // Save refresh token in database (as its not been used to generate new access token)
   newUser.refreshTokens.push(refreshToken);
   await newUser.save();
+
+  // Sending verification mail to user.
+  const verificationLink = `http://localhost:3000/verify/${verificationToken}`;
+  await sendVerificationEmail(email, "Verification Email", verificationLink);
 
   // Send refresh tokens as HTTP-only cookie
   res.cookie("refreshToken", refreshToken, {
@@ -46,14 +65,14 @@ export const registerUser = asyncHandler(async (req, res) => {
   res.status(201).json(
     new ApiResponse(
       201,
-      { 
-        id: newUser._id, 
-        username: newUser.username, 
+      {
+        id: newUser._id,
+        username: newUser.username,
         email: newUser.email,
         accessToken,
         expiresIn: expiresInSeconds
       },
-      `User with username '${username}' created successfully.`
+      `User with username '${username}' registered successfully. Please Verify Your email!`
     )
   );
 });
